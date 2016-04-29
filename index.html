@@ -10,27 +10,58 @@
     <div class="dashboard">
       <div class="card" id="traffic">
         <h2>Traffic</h2>
-        <div class="card-section" id="traffic-mtd"></div>
-        <div class="card-section" id="traffic-pv-pr"></div>
-        <div class="card-section" id="traffic-by-post"></div>
-        <div class="card-section" id="traffic-by-channel"></div>
+        <div class="card-section" id="traffic-mtd">
+          <h3>MTD Views vs. Goal</h3>
+          <div class="metrics"></div>
+          <div class="progress-bar"></div>
+        </div>
+        <div class="card-section" id="traffic-pv-pr">
+          <h3>Posts Viewed vs. Read</h3>
+          <div class="table"></div>
+        </div>
+        <div class="card-section" id="traffic-by-post">
+          <h3>Top Posts</h3>
+          <div class="table inline" id="top-view-posts"></div>
+          <div class="table inline" id="top-read-posts"></div>
+        </div>
+        <div class="card-section" id="traffic-by-channel">
+          <h3>Traffic By Channel</h3>
+        </div>
       </div>
       <div class="card" id="engagement">
         <h2>Engagement</h2>
-        <div class="card-section" id="engagement-sub"></div>
-        <div class="card-section" id="engagement-unsub"></div>
-        <div class="card-section" id="engagement-share"></div>
-        <div class="card-section" id="engagement-conv"></div>
+        <div class="card-section" id="engagement-sub">
+          <h3>Subscribes</h3>
+        </div>
+        <div class="card-section" id="engagement-unsub">
+          <h3>Unsubscribes</h3>
+        </div>
+        <div class="card-section" id="engagement-share">
+          <h3>Shares</h3>
+          <div class="graph"></div>
+        </div>
+        <div class="card-section" id="engagement-conv">
+          <h3>Conversions</h3>
+        </div>
       </div>
       <div class="card" id="leads">
         <h2>Leads</h2>
-        <div class="card-section" id="leads-signup"></div>
-        <div class="card-section" id="leads-conv"></div>
+        <div class="card-section" id="leads-first-touch">
+          <h3>First Touch Conversions</h3>
+          <div class="table"></div>
+        </div>
+        <div class="card-section" id="leads-conv">
+          <h3>Blog vs. Overall Signup Rate</h3>
+          <div class="table"></div>
+        </div>
       </div>
-      <div class="card" id="overall-traffic">
-        <div id="date-dropdown"></div>
-        <div id="overall-traffic-dropdown"></div>
-        <div class="card-section" id="overall-traffic-graph"></div>
+      <div class="card full-width" id="overall-traffic">
+        <h2>Overall Blog Traffic</h2>
+        <div class="card-section" id="overall-traffic-graph">
+          <div id="date-dropdown"></div>
+          <div id="overall-traffic-dropdown"></div>
+          <div class="graph" id="traffic-graph"></div>
+        </div>
       </div>
     </div>
     <script>
@@ -77,6 +108,31 @@
         displayLeads(results.leads);
       }
       
+      function addMetric(div, label, val) {
+        $('<div class="metric"><div class="value">' + label + '</div><div class="value">' + val + '</div></div>')
+        .appendTo(div);
+      }
+      
+      function addText(div, text) {
+        $('<div class="text">' + text + '</div>')
+        .appendTo(div);
+      }
+      
+      function addTable(div, tableData) {
+        var $tableDiv = div.find('.table');
+        for (var arr in tableData) {
+          addTableRow($tableDiv, arr);
+        }
+      }
+      
+      function addTableRow(div, arr) {
+        $('<div class="row"></div>').appendTo(div);
+        for (var cell in arr) {
+          var divClass = (cell === arr[0]) ? ' first-col' : '';
+          $('<div class="cell' + divClass + '"></div>').appendTo(div);
+        }
+      }
+      
       function displayTraffic(trafficInfo) {
         $('#traffic').find('.card-section').empty();
         mtdViews(trafficInfo.mtd_views, trafficInfo.projected_views);
@@ -86,40 +142,109 @@
       }
       
       function mtdViews(views, projected) {
-        
+        var $mtdDiv = $('#traffic-mtd');
+        var $metricDiv = $mtdDiv.find('.metrics');
+        addMetric($metricDiv, 'Current', views);
+        addMetric($metricDiv, 'Projected', projected);
+        addMetric($metricDiv, 'Goal', monthlyViewGoal);
+        addProgressBar($mtdDiv, monthlyViewGoal, views);
+      }
+      
+      function addProgressBar(div, goal, toDate) {
+        var $bar = div.find('.progress-bar');
+        var percentage = toDate / goal;
+        var pixels = $bar.width() * percentage;
+        $('<div class="progress-bar"><div class="progress" style="width: ' + pixels + '"></div></div>').appendTo($bar);
       }
       
       function viewVsRead(firstView, firstRead, firstConv, overallView, overallRead, overallConv) {
-        
+        var $div = $('#traffic-pv-pr');
+        var arrays = [
+          ['', 'Posts Viewed', 'Posts Read', 'Conversion'],
+          ['First Touch', firstView, firstRead, firstConv],
+          ['Overall', overallView, overallRead, overallConv]
+        ];
+        addTable($div, arrays);
       }
       
       function topPostTable(topPV, topPR) {
-        
+        var $viewDiv = $('#top-view-posts');
+        var $readDiv = $('#top-read-posts');
+        var viewArrays = [
+          ['Post', 'Posts Viewed'],
+        ];
+        for (var i in topPV) {
+          viewArrays.push([_.keys(i)[0], _.values(i)[0]]);
+        }
+        var readArrays = [
+          ['Post', 'Posts Read'],
+        ];
+        for (var j in topPR) {
+          readArrays.push([_.keys(j)[0], _.values(j)[0]]);
+        }
+        addTable($viewDiv, viewArrays);
+        addTable($readDiv, readArrays);
       }
       
       function displayEngagement(engagementInfo) {
         $('#engagement').find('.card-section').empty();
-        $('#engagement-sub').append('<div class="label">This Month</div><div class="metric">' + engagementInfo.subscribes + '</div>');
+        addMetric($('#engagement-sub'), 'This Month', engagementInfo.subscribes);
+        addMetric($('#engagement-unsub'), 'This Month', 'Not Yet Configured');
         shares(engagementInfo.shares);
         conversion(engagementInfo.second_art_conv, engagementInfo.corp_site_conv);
       }
       
       function shares(obj) {
-        
+        var $shareDiv = $('#engagement-shares');
+        addChart($shareDiv, 'pie', obj);
+        var total = 0;
+        for (var val in _.values(obj)) {
+          total += val;
+        }
+        for (var key in _.keys(obj)) {
+          var text = key + ': ' + obj[key] + ' (' + (obj[key] / total * 100).toFixed() + '%)';
+          addText($shareDiv, text);
+        }
+      }
+      
+      function addChart($div, type, obj) {
+        var $graphDiv = $div.find('.graph');
+        $graphDiv.MPChart({
+          chartType: type,
+          data: obj
+        })
       }
       
       function conversion(secondArticle, corpSite) {
-        
+        var $convDiv = $('#engagement-conv');
+        addText($convDiv, 'To View 2nd Article: ' + secondArticle);
+        addText($convDiv, 'To View Corporate Site: ' + corpSite);
       }
       
       function displayLeads(leadInfo) {
         $('#leads').find('.card-section').empty();
-        $('#leads-signups').append('<div class="label">Leads</div><div class="metric">' + leadInfo.first_touch_signups + '</div>');
+        firstTouch(leadInfo.first_touch_signups, '(EXAMPLE)', '$293K', '(EXAMPLE)', '$34K');
         blogVsOverallSignup(leadInfo.first_touch_views, leadInfo.first_touch_signups, leadInfo.first_touch_signup_conv, leadInfo.overall_site_views, leadInfo.overall_signups, leadInfo.overall_signup_conv);
       }
       
+      function firstTouch(signups, opps, oppAmount, closed, closedAmount) {
+        var $firstTouchDiv = $('#leads-first-touch');
+        var firstTouchArrays = [
+          ['Leads', leadInfo.first_touch_signups, ''],
+          ['Opportunities', opps, oppAmount],
+          ['Closed Business', closed, closedAmount]
+        ];
+        addTable($firstTouchDiv, firstTouchArrays);
+      }
+      
       function blogVsOverallSignup(firstViews, firstSignups, firstConv, overallViews, overallSignups, overallConv) {
-        
+        var $blogVsOverallDiv = $('#leads-conv');
+        var blogVsOverallArrays = [
+          ['', 'Views', 'Signups', 'Conversion'],
+          ['Blog', firstViews, firstSignups, firstConv],
+          ['Overall', overallViews, overallSignups, overallConv]
+        ];
+        addTable($blogVsOverallDiv, blogVsOverallArrays);
       }
       
       // run graph query
