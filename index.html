@@ -99,9 +99,7 @@ Please be careful making any decisions based on this code; we are not responsibl
       function runQuery() {
         // dashboard JQL query
         var script = $('#dashboard').html();
-        debugger;
         script = $.trim(script);
-        debugger;
         var today = new Date();
         var queryParams = {
           from_date: date_to_string(new Date(today - 1000*60*60*24*30)),
@@ -265,13 +263,9 @@ Please be careful making any decisions based on this code; we are not responsibl
         addTable($blogVsOverallDiv, blogVsOverallArrays);
       }
       
-      // run graph query
+      // run graph query and populate graph
       function populateGraph(dates) {
-        var params = $.extend(dates, {
-          event: 'Blog - Post Viewed'
-        });
-        // set graph data
-        MP.api.segment(params).done(function(results) {
+        MP.api.segment('Blog - Post Viewed', dates).done(function(results) {
           $('#traffic-graph').MPChart('setData', results.values());
         })
       }
