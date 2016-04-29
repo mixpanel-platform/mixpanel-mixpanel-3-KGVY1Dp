@@ -256,7 +256,9 @@
           event: 'Blog - Post Viewed'
         });
         // set graph data
-        $('#traffic-graph').MPChart('setData', params);
+        MP.api.segmentation(params).done(function(results) {
+          $('#traffic-graph').MPChart('setData', results.values());
+        })
       }
       
       // run graph query when graph dropdowns change
