@@ -14,7 +14,7 @@ Please be careful making any decisions based on this code; we are not responsibl
     <link href='https://fonts.googleapis.com/css?family=Source+Sans+Pro:400,700,400italic' rel='stylesheet' type='text/css'>
     <script src="https://cdn.mxpnl.com/libs/mixpanel-platform/build/mixpanel-platform.v0.latest.min.js"></script>
   </head>
-  <body>
+  <body class="mixpanel-platform-body">
     <style>
       @font-face {
           font-family: 'Flama-Basic';
@@ -27,20 +27,26 @@ Please be careful making any decisions based on this code; we are not responsibl
         font-family: 'Source-Sans-Pro', sans-serif;
         font-size: 13px;
         color: #434e5b;
-        padding: 20px;
+        padding: 10px;
       }
       .card {
-        background-color: #e5e7ee;
+        background-color: rgb(251,252,253);
+        border: 10px solid #e5e7ee;
         width: 44%;
         vertical-align: top;
-        margin: 7px;
+        margin: 11px;
         padding: 20px;
+        float: left;
+        position: relative;
       }
       .card.full-width {
         width: 100%;
       }
       h2 {
-        font-size: 20px;
+        font-family: 'Flama-Basic';
+        text-transform: uppercase;
+        text-align: center;
+        font-size: 25px;
       }
       .card-section {
         margin: 30px 0;
@@ -74,16 +80,42 @@ Please be careful making any decisions based on this code; we are not responsibl
       .row {
         margin: 5px 0;
       }
+      .row.header-row {
+        font-family: 'Flama-Basic';
+        text-transform: uppercase;
+        font-size: 13px;
+        color: #838ca3;
+      }
       .cell {
-        font-size: 16px;
-        display: inline-block;
+        text-align: center;
         width: 90px;
         height: 25px;
         line-height: 25px;
+        padding: 5px;
+        display: inline-block;
+      }
+      .row:not(.header-row) .cell {
+        font-size: 17px;
+        font-weight: bold;
       }
       .cell.first-col {
         width: 140px;
+        font-weight: normal;
+        text-align: left;
+        color: #838ca3;
+      }
+      .row:not(.header-row) .cell.first-col {
         font-size: 13px;
+      }
+      #top-view-posts .cell, 
+      #top-read-posts .cell {
+        width: 97px;
+        text-align: center;
+      }
+      #top-view-posts .cell.first-col, 
+      #top-read-posts .cell.first-col {
+        width: 260px;
+        text-align: left;
       }
       .text {
         font-family: 'Flama-Basic';
@@ -93,7 +125,12 @@ Please be careful making any decisions based on this code; we are not responsibl
       }
       #date-dropdown, #unit-dropdown {
         vertical-align: top;
+        margin-bottom: 10px;
         display: inline-block;
+      }
+      #unit-dropdown {
+        max-height: 14px;
+        float: right;
       }
     </style>
     <div class="dashboard">
@@ -296,7 +333,6 @@ Please be careful making any decisions based on this code; we are not responsibl
       }
       
       function displayEngagement(engagementInfo) {
-        $('#engagement').find('.card-section').empty();
         addMetric($('#engagement-sub'), 'This Month', engagementInfo.subscribes);
         addMetric($('#engagement-unsub'), 'This Month', 'Not Yet Configured');
         shares(engagementInfo.shares);
@@ -332,7 +368,7 @@ Please be careful making any decisions based on this code; we are not responsibl
       }
       
       function displayLeads(leadInfo) {
-        firstTouch(leadInfo.first_touch_signups, '(EXAMPLE)', '$293K', '(EXAMPLE)', '$34K');
+        firstTouch(leadInfo.first_touch_signups, '(EX)', '$293K', '(EX)', '$34K');
         blogVsOverallSignup(leadInfo.first_touch_views, leadInfo.first_touch_signups, leadInfo.first_touch_signup_conv, leadInfo.overall_site_views, leadInfo.overall_signups, leadInfo.overall_signup_conv);
       }
       
