@@ -65,7 +65,7 @@
       </div>
     </div>
     <script>
-      // set up dropdowns for graph
+      // set up dropdowns and graph
       var options = [
         {value: 'day', label: 'Day'},
         {value: 'week', label: 'Week'},
@@ -73,6 +73,9 @@
         ]
       var unitDropdown = $('#unit-dropdown').MPSelect(options);
       var dateDropdown = $('#date-dropdown').MPDatepicker();
+      $('#traffic-graph').MPChart({
+        chartType: 'line'
+      });
       
       // convert dates to strings (for jql queries)
       function date_to_string(d) {
