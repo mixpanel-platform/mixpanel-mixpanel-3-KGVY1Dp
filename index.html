@@ -31,6 +31,10 @@ Please be careful making any decisions based on this code; we are not responsibl
       }
       .card {
         background-color: #e5e7ee;
+        width: 44%;
+        vertical-align: top;
+        margin: 0 7px;
+        padding: 20px;
       }
       h2 {
         font-size: 20px;
@@ -41,8 +45,12 @@ Please be careful making any decisions based on this code; we are not responsibl
       h3 {
         font-size: 16px;
       }
+      .metrics {
+        text-align: center;
+      }
       .metric {
         text-align: center;
+        margin: 0 20px;
         display: inline-block;
       }
       .label {
@@ -63,17 +71,18 @@ Please be careful making any decisions based on this code; we are not responsibl
       .cell {
         font-size: 16px;
         display: inline-block;
-        width: 100px;
+        width: 90px;
         height: 25px;
         line-height: 25px;
       }
       .cell.first-col {
-        width: 200px;
+        width: 140px;
         font-size: 13px;
       }
       .text {
         font-family: 'Flama-Basic';
         text-transform: uppercase;
+        margin: 10px 0;
       }
     </style>
     <div class="dashboard">
@@ -196,7 +205,7 @@ Please be careful making any decisions based on this code; we are not responsibl
       }
       
       function addMetric(div, label, val) {
-        $('<div class="metric"><div class="value">' + label + '</div><div class="value">' + val + '</div></div>')
+        $('<div class="metric"><div class="label">' + label + '</div><div class="value">' + val + '</div></div>')
         .appendTo(div);
       }
       
