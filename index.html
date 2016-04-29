@@ -13,9 +13,63 @@ Please be careful making any decisions based on this code; we are not responsibl
     <link rel="stylesheet" type="text/css" href="https://cdn.mxpnl.com/libs/mixpanel-platform/build/mixpanel-platform.v0.latest.min.css">
     <script src="https://cdn.mxpnl.com/libs/mixpanel-platform/build/mixpanel-platform.v0.latest.min.js"></script>
   </head>
-  <body class="mixpanel-platform-body">
+  <body>
     <style>
-      
+      @font-face {
+          font-family: 'Flama-Basic';
+          font-style: normal;
+          font-weight: normal;
+          src: local('Flama-Basic'), url('fonts/Flama-Basic.woff') format('woff');
+      }
+      .dashboard {
+        background-color: white;
+        font-family: 'Source-Sans-Pro', sans-serif;
+        font-size: 13px;
+        color: #434e5b;
+        padding: 20px;
+      }
+      .card {
+        background-color: #e5e7ee;
+      }
+      h2 {
+        font-size: 20px;
+      }
+      .card-section {
+        margin: 30px 0;
+      }
+      h3 {
+        font-size: 16px;
+      }
+      .metric {
+        text-align: center;
+        display: inline-block;
+      }
+      .label {
+        font-family: 'Flama-Basic';
+        text-transform: uppercase;
+        color: #838ca3;
+        margin: 10px 0;
+      }
+      .value {
+        font-size: 20px;
+      }
+      .table {
+        
+      }
+      .row {
+        margin: 5px 0;
+      }
+      .cell {
+        font-size: 16px;
+        display: inline-block;
+        width: 100px;
+        height: 25px;
+        line-height: 25px;
+      }
+      .text {
+        font-family: 'Flama-Basic';
+        text-transform: uppercase;
+      }
     </style>
     <div class="dashboard">
       <div class="card" id="traffic">
