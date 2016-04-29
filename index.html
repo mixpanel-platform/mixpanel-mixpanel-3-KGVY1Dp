@@ -33,7 +33,7 @@ Please be careful making any decisions based on this code; we are not responsibl
         background-color: #e5e7ee;
         width: 44%;
         vertical-align: top;
-        margin: 0 7px;
+        margin: 7px;
         padding: 20px;
       }
       h2 {
@@ -82,6 +82,7 @@ Please be careful making any decisions based on this code; we are not responsibl
       .text {
         font-family: 'Flama-Basic';
         text-transform: uppercase;
+        text-align: center;
         margin: 10px 0;
       }
     </style>
@@ -295,13 +296,14 @@ Please be careful making any decisions based on this code; we are not responsibl
       function shares(obj) {
         var $shareDiv = $('#engagement-shares');
         addChart($shareDiv, 'pie', obj);
+        var $shareTextDiv = $('<div></div>').appendTo($shareDiv);
         var total = 0;
         for (var val in _.values(obj)) {
           total += val;
         }
         for (var key in _.keys(obj)) {
           var text = key + ': ' + obj[key] + ' (' + (obj[key] / total * 100).toFixed() + '%)';
-          addText($shareDiv, text);
+          addText($shareTextDiv, text);
         }
       }
       
