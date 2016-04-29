@@ -1,3 +1,10 @@
+<!-- 
+
+This is not a Mixpanel product, nor has it gone through a formal review process.
+Please be careful making any decisions based on this code; we are not responsible for the results.
+
+-->
+
 <!DOCTYPE html>
 <html>
   <head>
@@ -86,7 +93,7 @@
       function runQuery() {
         // dashboard JQL query
         var script = $('#dashboard').html();
-        script = $.trim(script);
+        // script = $.trim(script);
         var today = new Date();
         var queryParams = {
           from_date: date_to_string(new Date(today - 1000*60*60*24*30)),
