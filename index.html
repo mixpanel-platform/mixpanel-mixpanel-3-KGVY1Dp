@@ -104,6 +104,7 @@ Please be careful making any decisions based on this code; we are not responsibl
         color: #838ca3;
       }
       .row:not(.header-row) .cell.first-col {
+        font-weight: normal;
         font-size: 13px;
       }
       #top-view-posts .cell, 
@@ -269,7 +270,7 @@ Please be careful making any decisions based on this code; we are not responsibl
       }
       
       function addTableRow(div, arr, rowNum) {
-        var rowDivClass = (rowNum == 0) ? ' header-row' : '';
+        var rowDivClass = (rowNum == 0 && arr[0] !== 'Leads') ? ' header-row' : '';
         var $row = $('<div class="row' + rowDivClass + '"></div>').appendTo(div);
         for (var cell in arr) {
           var divClass = (cell == 0) ? ' first-col' : '';
@@ -303,7 +304,7 @@ Please be careful making any decisions based on this code; we are not responsibl
       function viewVsRead(firstView, firstRead, firstConv, overallView, overallRead, overallConv) {
         var $div = $('#traffic-pv-pr');
         var arrays = [
-          ['', 'Posts Viewed', 'Posts Read', 'Conversion'],
+          ['', 'Views', 'Reads', 'Conversion'],
           ['First Touch', firstView, firstRead, firstConv],
           ['Overall', overallView, overallRead, overallConv]
         ];
