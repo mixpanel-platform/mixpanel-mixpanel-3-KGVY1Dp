@@ -66,7 +66,7 @@ Please be careful making any decisions based on this code; we are not responsibl
         <h2>Overall Blog Traffic</h2>
         <div class="card-section" id="overall-traffic-graph">
           <div id="date-dropdown"></div>
-          <div id="overall-traffic-dropdown"></div>
+          <div id="unit-dropdown"></div>
           <div class="graph" id="traffic-graph"></div>
         </div>
       </div>
@@ -150,7 +150,6 @@ Please be careful making any decisions based on this code; we are not responsibl
       }
       
       function displayTraffic(trafficInfo) {
-        $('#traffic').find('.card-section').empty();
         mtdViews(trafficInfo.mtd_views, trafficInfo.projected_views);
         viewVsRead(trafficInfo.first_touch_views, trafficInfo.first_touch_reads, trafficInfo.first_touch_read_conv, trafficInfo.overall_views, trafficInfo.overall_reads, trafficInfo.overall_read_conv);
         topPostTable(trafficInfo.top_pv, trafficInfo.top_pr);
@@ -238,7 +237,6 @@ Please be careful making any decisions based on this code; we are not responsibl
       }
       
       function displayLeads(leadInfo) {
-        $('#leads').find('.card-section').empty();
         firstTouch(leadInfo.first_touch_signups, '(EXAMPLE)', '$293K', '(EXAMPLE)', '$34K');
         blogVsOverallSignup(leadInfo.first_touch_views, leadInfo.first_touch_signups, leadInfo.first_touch_signup_conv, leadInfo.overall_site_views, leadInfo.overall_signups, leadInfo.overall_signup_conv);
       }
