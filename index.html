@@ -256,7 +256,7 @@
           event: 'Blog - Post Viewed'
         });
         // set graph data
-        MP.api.segmentation(params).done(function(results) {
+        MP.api.segment(params).done(function(results) {
           $('#traffic-graph').MPChart('setData', results.values());
         })
       }
