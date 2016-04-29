@@ -7,44 +7,283 @@
     <script src="https://cdn.mxpnl.com/libs/mixpanel-platform/build/mixpanel-platform.v0.latest.min.js"></script>
   </head>
   <body class="mixpanel-platform-body">
-    <div class="mixpanel-platform-section">
-      <div id="eventSelect" style="float: left;"></div>
-      <div id="by" class="mixpanel-platform-label" style="margin-left: 10px; display: none;">by</div>
-      <div id="propSelect" style="float: left;"></div>
-      <div id="dateSelect" style="float: right;"></div>
-      <div style="clear: both;"></div>
-      <div id="graph"></div>
+    <div class="dashboard">
+      <div class="card" id="traffic">
+        <h2>Traffic</h2>
+        <div class="card-section" id="traffic-mtd"></div>
+        <div class="card-section" id="traffic-pv-pr"></div>
+        <div class="card-section" id="traffic-by-post"></div>
+        <div class="card-section" id="traffic-by-channel"></div>
+      </div>
+      <div class="card" id="engagement">
+        <h2>Engagement</h2>
+        <div class="card-section" id="engagement-sub"></div>
+        <div class="card-section" id="engagement-unsub"></div>
+        <div class="card-section" id="engagement-share"></div>
+        <div class="card-section" id="engagement-conv"></div>
+      </div>
+      <div class="card" id="leads">
+        <h2>Leads</h2>
+        <div class="card-section" id="leads-signup"></div>
+        <div class="card-section" id="leads-conv"></div>
+      </div>
+      <div class="card" id="overall-traffic">
+        <div id="date-dropdown"></div>
+        <div id="overall-traffic-dropdown"></div>
+        <div class="card-section" id="overall-traffic-graph"></div>
+      </div>
     </div>
-    <div id="table"></div>
     <script>
-      var eventSelect = $('#eventSelect').MPEventSelect();
-      var propSelect  = $('#propSelect').MPPropertySelect();
-      var dateSelect  = $('#dateSelect').MPDatepicker();
-      var eventGraph  = $('#graph').MPChart({chartType: 'line'});
-      var eventTable  = $('#table').MPTable({
-        showPercentages: true,
-        firstColHeader: 'Event'
-      });
+      // set up dropdowns for graph
+      var options = [
+        {value: 'day', label: 'Day'},
+        {value: 'week', label: 'Week'},
+        {value: 'month', label: 'Month'},
+        ]
+      var unitDropdown = $('#unit-dropdown').MPSelect(options);
+      var dateDropdown = $('#date-dropdown').MPDatepicker();
+      
+      // convert dates to strings (for jql queries)
+      function date_to_string(d) {
+        return d.toISOString().split('T')[0];
+      }
 
-      var runQuery = function() {
-        var eventName = eventSelect.MPEventSelect('value'),
-            propName  = propSelect.MPPropertySelect('value'),
-            dateRange = dateSelect.MPDatepicker('value');
-
-        if (eventName) {
-          MP.api.segment(eventName, propName, dateRange).done(function(results) {
-            eventGraph.MPChart('setData', results);
-            eventTable.MPTable('setData', results);
-          });
+      // run query
+      function runQuery() {
+        // dashboard JQL query
+        var script = $('#dashboard').html();
+        script = $.trim(script);
+        var today = new Date();
+        var queryParams = {
+          from_date: date_to_string(new Date(today - 1000*60*60*24*30)),
+          to_date: date_to_string(today)
         }
-      };
-      eventSelect.on('change', function(e, eventName) {
-        propSelect.MPPropertySelect('setEvent', eventName);
-        $("#by").show();
-        runQuery();
+        MP.api.jql(script, queryParams).done(function(results) {
+          displayDashboard(results);
+        });
+        
+        // overall traffic graph
+        var dates = dateDropdown.val();
+        var unit = unitDropdown.val();
+        populateGraph(dates, unit);
+      }
+      
+      // display dashboard metrics
+      function displayDashboard(results) {
+        results = results[0];
+        console.log(results);
+        displayTraffic(results.traffic);
+        displayEngagement(results.engagement);
+        displayLeads(results.leads);
+      }
+      
+      function displayTraffic(trafficInfo) {
+        $('#traffic').find('.card-section').empty();
+        mtdViews(trafficInfo.mtd_views, trafficInfo.projected_views);
+        viewVsRead(trafficInfo.first_touch_views, trafficInfo.first_touch_reads, trafficInfo.first_touch_read_conv, trafficInfo.overall_views, trafficInfo.overall_reads, trafficInfo.overall_read_conv);
+        topPostTable(trafficInfo.top_pv, trafficInfo.top_pr);
+        // channel breakdown
+      }
+      
+      function mtdViews(views, projected) {
+        
+      }
+      
+      function viewVsRead(firstView, firstRead, firstConv, overallView, overallRead, overallConv) {
+        
+      }
+      
+      function topPostTable(topPV, topPR) {
+        
+      }
+      
+      function displayEngagement(engagementInfo) {
+        $('#engagement').find('.card-section').empty();
+        $('#engagement-sub').append('<div class="label">This Month</div><div class="metric">' + engagementInfo.subscribes + '</div>');
+        shares(engagementInfo.shares);
+        conversion(engagementInfo.second_art_conv, engagementInfo.corp_site_conv);
+      }
+      
+      function shares(obj) {
+        
+      }
+      
+      function conversion(secondArticle, corpSite) {
+        
+      }
+      
+      function displayLeads(leadInfo) {
+        $('#leads').find('.card-section').empty();
+        $('#leads-signups').append('<div class="label">Leads</div><div class="metric">' + leadInfo.first_touch_signups + '</div>');
+        blogVsOverallSignup(leadInfo.first_touch_views, leadInfo.first_touch_signups, leadInfo.first_touch_signup_conv, leadInfo.overall_site_views, leadInfo.overall_signups, leadInfo.overall_signup_conv);
+      }
+      
+      function blogVsOverallSignup(firstViews, firstSignups, firstConv, overallViews, overallSignups, overallConv) {
+        
+      }
+      
+      // run graph query
+      function populateGraph(dates) {
+        var params = $.extend(dates, {
+          event: 'Blog - Post Viewed'
+        });
+        // set graph data
+        MP.api.graph(setData, params);
+      }
+      
+      // run graph query when graph dropdowns change
+      $('#date-dropdown').on('change', function(e, dates) {
+        var unit = unitDropdown.val();
+        populateGraph(dates, unit);
       });
-      propSelect.on('change', runQuery);
-      dateSelect.on('change', runQuery);
+      
+      $('#overall-traffic-dropdown').on('change', function(e, unit) {
+        var dates = dateDropdown.val();
+        populateGraph(dates, unit);
+      });
+      
+      // run query when report loads
+      runQuery();
+      
     </script>
+    <script type="text/jql" id="dashboard">
+      function main() {
+        return Events({ 
+          from_date: '2016-04-01', 
+          to_date: '2016-04-30',
+        })
+        .groupByUser(function(state, events) {
+          state = state || {
+            first_article: '',
+            second_article: 0,
+            blog_view_corp_site: 0,
+            overall_view_corp_site: 0,
+            first_touch: 0,
+            blog_signup: 0,
+            overall_signup: 0,
+            first_touch_view: 0,
+            first_touch_read: 0,
+            overall_view: 0,
+            overall_read: 0,
+            subscribe: 0,
+            share: {},
+            post_views: {},
+            post_reads: {},
+          };
+          _.each(events, function(e) {
+            // first touch user?
+            if (!state.first_touch && e.properties['first touch landing page url'] && e.properties['first touch landing page url'].indexOf('blog') > -1) {
+              state.first_touch = 1;
+            }
+            if (e.name === 'Blog - Post Viewed') {
+              // viewed article
+              state.overall_view = 1;
+              var post_view = e.properties.slug;
+              state.post_views[post_view] = 1;
+              if (state.first_touch) {
+                state.first_touch_view = 1;
+              }
+              if (!state.first_article) {
+                state.first_article = e.properties.slug;
+              } else if (state.first_article !== e.properties.slug) {
+                // converted to second article
+                state.second_article = 1;
+              }
+            } else if (e.name === 'Blog - Post Read') {
+              state.overall_read = 1;
+              var post_read = e.properties.slug;
+              state.post_reads[post_read] = 1;
+              if (state.first_touch) {
+                state.first_touch_read = 1;
+              }
+            } else if (e.name === '$signup') {
+              // signed up
+              if (state.first_touch) {
+                state.blog_signup = 1;
+              } else {
+                state.overall_signup = 1;
+              }
+            } else if (e.name === 'Blog - Subscribed') {
+              state.subscribe = 1;
+            } else if (e.name === 'Blog - Share') {
+              var share_method = e.properties.Method;
+              state.share[share_method] = 1;
+            } else if (e.name === 'Viewed landing page') {
+              if (state.first_touch) {
+                // viewed corp site after blog was first page they visited
+                state.blog_view_corp_site = 1;
+              } else {
+                state.overall_view_corp_site = 1;
+              }
+            }
+          });
+          return state;
+        })
+        .filter(function(item) { 
+          return _.values(item.value).indexOf(1) > -1;
+        })
+        .map(function(item) {
+          delete item.value['first_article'];
+          return item.value;
+        })
+        .reduce(mixpanel.reducer.object_merge())
+        .map(function(item) {
+          var top_views = get_top_posts(item.post_views);
+          var top_reads = get_top_posts(item.post_reads);
+          var result = {
+            traffic: {},
+            engagement: {},
+            leads: {}
+          };
+          result.traffic['mtd_views'] = item.overall_view;
+          result.traffic['projected_views'] = project(item.overall_view);
+          result.traffic['top_pv'] = top_views;
+          result.traffic['top_pr'] = top_reads;
+          result.traffic['first_touch_views'] = item.first_touch_view;
+          result.traffic['first_touch_reads'] = item.first_touch_read;
+          result.traffic['first_touch_read_conv'] = (item.first_touch_read / item.first_touch_view * 100).toFixed(1) + '%';
+          result.traffic['overall_views'] = item.overall_view;
+          result.traffic['overall_reads'] = item.overall_read;
+          result.traffic['overall_read_conv'] = (item.overall_read / item.overall_view * 100).toFixed(1) + '%';
+          result.engagement['subscribes'] = item.subscribe;
+          result.engagement['unsubscribes'] = undefined;
+          result.engagement['shares'] = item.shares;
+          result.engagement['second_art_conv'] = (item.second_article / item.overall_view * 100).toFixed(1) + '%';
+          result.engagement['corp_site_conv'] = (item.blog_view_corp_site / item.overall_view * 100).toFixed(1) + '%';
+          result.leads['first_touch_views'] = item.first_touch_view;
+          result.leads['first_touch_signups'] = item.blog_signup;
+          result.leads['first_touch_singup_conv'] = (item.blog_signup / item.first_touch * 100).toFixed(1) + '%';
+          result.leads['overall_site_views'] = item.overall_view_corp_site;
+          result.leads['overall_signups'] = item.overall_signup;
+          result.leads['overall_signup_conv'] = (item.overall_view_corp_site / item.overall_signup * 100).toFixed(1) + '%';
+          return result;
+        });
+      }
+      
+      function get_top_posts(posts) {
+        return _.chain(posts)
+        .map(function(val, key) {
+          var obj = {};
+          obj[key] = val;
+          return obj;
+        })
+        .sortBy(function(item) { return -1 * _.values(item)[0] })
+        .first(5)
+        .value();
+      }
+      
+      function project(value) {
+        var d = new Date();
+        var today = d.getDate();
+        var month = d.getMonth();
+        var year = d.getYear();
+        var totalDays = daysInMonth(year, month);
+        return (value * (totalDays / today)).toFixed();
+      }
+      
+      function daysInMonth(year, month) {
+          return new Date(year, month, 0).getDate();
+      }    </script>
+    <script type="text/jql" id="channel_traffic"></script>
   </body>
 </html>
