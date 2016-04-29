@@ -31,8 +31,12 @@ Please be careful making any decisions based on this code; we are not responsibl
         </div>
         <div class="card-section" id="traffic-by-post">
           <h3>Top Posts</h3>
-          <div class="table inline" id="top-view-posts"></div>
-          <div class="table inline" id="top-read-posts"></div>
+          <div class="inline" id="top-view-posts">
+            <div class="table"></div>
+          </div>
+          <div class="inline" id="top-read-posts">
+            <div class="table"></div>
+          </div>
         </div>
         <div class="card-section" id="traffic-by-channel">
           <h3>Traffic By Channel</h3>
@@ -145,7 +149,6 @@ Please be careful making any decisions based on this code; we are not responsibl
       function addTable(div, tableData) {
         var $tableDiv = div.find('.table');
         for (var arr in tableData) {
-          if (tableData.length === 5) debugger;
           addTableRow($tableDiv, tableData[arr]);
         }
       }
@@ -153,8 +156,7 @@ Please be careful making any decisions based on this code; we are not responsibl
       function addTableRow(div, arr) {
         var $row = $('<div class="row"></div>').appendTo(div);
         for (var cell in arr) {
-          if (arr.length === 2) debugger;
-          var divClass = (cell === 0) ? ' first-col' : '';
+          var divClass = (cell == 0) ? ' first-col' : '';
           $('<div class="cell' + divClass + '">' + arr[cell] + '</div>').appendTo($row);
         }
       }
