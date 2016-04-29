@@ -145,7 +145,6 @@ Please be careful making any decisions based on this code; we are not responsibl
       
       function addTableRow(div, arr) {
         var $row = $('<div class="row"></div>').appendTo(div);
-        console.log(arr);
         for (var cell in arr) {
           var divClass = (cell === 0) ? ' first-col' : '';
           $('<div class="cell' + divClass + '">' + arr[cell] + '</div>').appendTo($row);
@@ -192,13 +191,13 @@ Please be careful making any decisions based on this code; we are not responsibl
           ['Post', 'Posts Viewed'],
         ];
         for (var i in topPV) {
-          viewArrays.push([_.keys(i)[0], _.values(i)[0]]);
+          viewArrays.push([_.keys(topPV[i])[0], _.values(topPV[i])[0]]);
         }
         var readArrays = [
           ['Post', 'Posts Read'],
         ];
         for (var j in topPR) {
-          readArrays.push([_.keys(j)[0], _.values(j)[0]]);
+          readArrays.push([_.keys(topPR[j])[0], _.values(topPR[j])[0]]);
         }
         addTable($viewDiv, viewArrays);
         addTable($readDiv, readArrays);
@@ -277,7 +276,7 @@ Please be careful making any decisions based on this code; we are not responsibl
         populateGraph(dates, unit);
       });
       
-      $('#overall-traffic-dropdown').on('change', function(e, unit) {
+      $('#unit-dropdown').on('change', function(e, unit) {
         var dates = dateDropdown.val();
         populateGraph(dates, unit);
       });
