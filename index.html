@@ -14,6 +14,9 @@ Please be careful making any decisions based on this code; we are not responsibl
     <script src="https://cdn.mxpnl.com/libs/mixpanel-platform/build/mixpanel-platform.v0.latest.min.js"></script>
   </head>
   <body class="mixpanel-platform-body">
+    <style>
+      
+    </style>
     <div class="dashboard">
       <div class="card" id="traffic">
         <h2>Traffic</h2>
@@ -191,6 +194,8 @@ Please be careful making any decisions based on this code; we are not responsibl
           ['Post', 'Posts Viewed'],
         ];
         for (var i in topPV) {
+          console.log(topPV[i])
+          console.log(_.keys(topPV[i]))
           viewArrays.push([_.keys(topPV[i])[0], _.values(topPV[i])[0]]);
         }
         var readArrays = [
