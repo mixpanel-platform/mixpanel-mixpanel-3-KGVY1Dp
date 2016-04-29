@@ -264,8 +264,11 @@ Please be careful making any decisions based on this code; we are not responsibl
       }
       
       // run graph query and populate graph
-      function populateGraph(dates) {
-        MP.api.segment('Blog - Post Viewed', dates).done(function(results) {
+      function populateGraph(dates, unit) {
+        var params = $.extend(dates, {
+          unit: unit
+        })
+        MP.api.segment('Blog - Post Viewed', params).done(function(results) {
           $('#traffic-graph').MPChart('setData', results.values());
         })
       }
