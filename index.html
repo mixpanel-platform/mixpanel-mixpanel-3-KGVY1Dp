@@ -144,7 +144,7 @@ Please be careful making any decisions based on this code; we are not responsibl
         position: absolute;
         top: -95px;
       }
-      #engagement-share .graph svg > rect:nth-child(2) {
+      #engagement-share .graph svg > rect {
         stroke-width: 0;
         fill: transparent;
       }
@@ -283,7 +283,6 @@ Please be careful making any decisions based on this code; we are not responsibl
       // display dashboard metrics
       function displayDashboard(results) {
         results = results[0];
-        console.log(results);
         displayTraffic(results.traffic);
         displayEngagement(results.engagement);
         displayLeads(results.leads);
