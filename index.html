@@ -83,7 +83,7 @@ Please be careful making any decisions based on this code; we are not responsibl
       }
       .progress {
         height: 20px;
-        background-color: blue;
+        background-color: rgb(83, 163, 235);
         border-radius: 3px 0 0 3px;
         -webkit-border-radius: 3px 0 0 3px;
         -moz-border-radius: 3px 0 0 3px;
@@ -134,6 +134,9 @@ Please be careful making any decisions based on this code; we are not responsibl
       #top-read-posts .cell.first-col {
         width: 260px;
         text-align: left;
+      }
+      #engagement-share .graph {
+        width: 60%;
       }
       .text {
         font-family: 'Flama-Basic';
@@ -366,10 +369,11 @@ Please be careful making any decisions based on this code; we are not responsibl
         var $shareTextDiv = $('<div></div>').appendTo($shareDiv);
         var total = 0;
         for (var val in _.values(obj)) {
-          total += val;
+          total += _.values(obj)[val];
         }
         for (var key in _.keys(obj)) {
-          var text = key + ': ' + obj[key] + ' (' + (obj[key] / total * 100).toFixed() + '%)';
+          var text = _.keys(obj)[key]
+          var text = text + ': ' + obj[text] + ' (' + (obj[text] / total * 100).toFixed() + '%)';
           addText($shareTextDiv, text);
         }
       }
