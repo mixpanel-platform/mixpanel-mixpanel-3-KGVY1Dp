@@ -378,6 +378,7 @@ Please be careful making any decisions based on this code; we are not responsibl
       }
       
       function addChart($div, type, obj) {
+        consolel.log(obj);
         var $graphDiv = $div.find('.graph');
         $graphDiv.MPChart({
           chartType: type,
