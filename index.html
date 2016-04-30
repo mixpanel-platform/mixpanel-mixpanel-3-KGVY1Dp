@@ -136,7 +136,19 @@ Please be careful making any decisions based on this code; we are not responsibl
         text-align: left;
       }
       #engagement-share .graph {
-        width: 60%;
+        width: 65%;
+        position: absolute;
+        top: -95px;
+      }
+      #engagement-share .graph svg > rect:nth-child(2) {
+        stroke-width: 0;
+        fill: transparent;
+      }
+      .share-text {
+        width: 35%;
+        float: right;
+        top: 30px;
+        position: relative;
       }
       .text {
         font-family: 'Flama-Basic';
@@ -219,7 +231,7 @@ Please be careful making any decisions based on this code; we are not responsibl
       ////////////// SET VARIABLES HERE ////////////////
       
       // current monthly goal for blog post views
-      var monthlyViewGoal = 20000;
+      var monthlyViewGoal = 45000;
       
       //////////////////////////////////////////////////
       
@@ -366,7 +378,7 @@ Please be careful making any decisions based on this code; we are not responsibl
           'example3': 250
         }
         addChart($shareDiv, 'pie', obj);
-        var $shareTextDiv = $('<div></div>').appendTo($shareDiv);
+        var $shareTextDiv = $('<div class="share-text"></div>').appendTo($shareDiv);
         var total = 0;
         for (var val in _.values(obj)) {
           total += _.values(obj)[val];
