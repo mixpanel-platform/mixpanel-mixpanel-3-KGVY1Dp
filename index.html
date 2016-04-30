@@ -79,6 +79,7 @@ Please be careful making any decisions based on this code; we are not responsibl
         height: 20px;
         border: 1px solid #e5e7ee;
         border-radius: 3px;
+        margin-top: 10px;
         -webkit-border-radius: 3px;
         -moz-border-radius: 3px;
       }
@@ -137,7 +138,7 @@ Please be careful making any decisions based on this code; we are not responsibl
         text-align: left;
       }
       #engagement-share {
-        height: 165px;
+        height: 155px;
       }
       #engagement-share .graph {
         width: 65%;
@@ -334,7 +335,7 @@ Please be careful making any decisions based on this code; we are not responsibl
         var $bar = div.find('.progress-bar');
         var percentage = toDate / goal;
         var pixels = $bar.width() * percentage;
-        $('<div class="progress-bar"><div class="progress" style="width: ' + pixels + '"></div></div>').appendTo($bar);
+        $('<div class="progress" style="width: ' + pixels + 'px"></div>').appendTo($bar);
       }
       
       function viewVsRead(firstView, firstRead, firstConv, overallView, overallRead, overallConv) {
