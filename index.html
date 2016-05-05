@@ -435,6 +435,7 @@ Please be careful making any decisions based on this code; we are not responsibl
       
       function displayLeads(leadInfo) {
         firstTouch(leadInfo.first_touch_signups, '(EX)', '$293K', '(EX)', '$34K');
+        console.log(leadInfo)
         blogVsOverallSignup(leadInfo.first_touch_views, leadInfo.first_touch_signups, leadInfo.first_touch_signup_conv, leadInfo.overall_site_views, leadInfo.overall_signups, leadInfo.overall_signup_conv);
       }
       
