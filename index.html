@@ -482,6 +482,41 @@ Please be careful making any decisions based on this code; we are not responsibl
       
     </script>
     <script type="text/jql" id="dashboard">
+      var sources = {
+        'refer_social': ['facebook', 'twitter', 't.co', 'linkedin', 'lnkd', 'pinterest',],
+        'refer_search': ['google', 'bing', 'yahoo',],
+      };
+      function readSources(domain) {
+        domain = domain.toLowerCase();
+        var types = Object.keys(sources);
+        for (var i = 0, j = types.length; i < j; i++) {
+          for (var k = 0, l = sources[types[i]].length; k < l; k++) {
+            if (domain.indexOf(sources[types[i]][k]) > -1) {
+              return types[i];
+            }
+          }
+        }
+        return 'refer_other';
+      }
+      function readUtm(utm) {
+        if (utm.toLowerCase() === 'email') { return 'utm_email'; }
+        else if (utm.toLowerCase() === 'social') { return 'utm_social'; }
+        else { return 'utm_other'; }
+      }
+      function getTrafficSource(event) {
+        var utm = event.properties.utm_medium;
+        if (utm) {
+          return readUtm(utm);
+        } else {
+          var url = event.properties.$referring_domain;
+          if (!url) { return 'refer_not_set'; }
+          var domainList = url.split('.');
+          // if (domainList.length <= 1) { return readSources(url); }
+          // var domain = domainList.slice(0, domainList.length-1).join('.');
+          return readSources(url);
+        }
+      }
+      
       function main() {
         return Events({ 
           from_date: '2016-04-01', 
@@ -501,6 +536,15 @@ Please be careful making any decisions based on this code; we are not responsibl
             overall_view: 0,
             overall_read: 0,
             subscribe: 0,
+            blog_channels: {
+              utm_email: 0,
+              utm_social: 0,
+              utm_other: 0,
+              refer_social: 0,
+              refer_search: 0,
+              refer_not_set: 0,
+              refer_other: 0
+            },
             share: {},
             post_views: {},
             post_reads: {},
@@ -513,11 +557,17 @@ Please be careful making any decisions based on this code; we are not responsibl
             if (e.name === 'Blog - Post Viewed') {
               // viewed article
               state.overall_view = 1;
+              // capture which article was read
               var post_view = e.properties.slug;
               state.post_views[post_view] = 1;
+              // capture channel 
+              var channel = getTrafficSource(e);
+              state.blog_channels[channel] += 1;
+              // determine whether user was first touch hit
               if (state.first_touch) {
                 state.first_touch_view = 1;
               }
+              // determine whether converted to second article
               if (!state.first_article) {
                 state.first_article = e.properties.slug;
               } else if (state.first_article !== e.properties.slug) {
@@ -525,6 +575,7 @@ Please be careful making any decisions based on this code; we are not responsibl
                 state.second_article = 1;
               }
             } else if (e.name === 'Blog - Post Read') {
+              // read article
               state.overall_read = 1;
               var post_read = e.properties.slug;
               state.post_reads[post_read] = 1;
@@ -554,9 +605,9 @@ Please be careful making any decisions based on this code; we are not responsibl
           });
           return state;
         })
-        .filter(function(item) { 
-          return _.values(item.value).indexOf(1) > -1;
-        })
+        // .filter(function(item) { 
+        //   return _.values(item.value).indexOf(1) > -1;
+        // })
         .map(function(item) {
           delete item.value['first_article'];
           return item.value;
@@ -570,27 +621,28 @@ Please be careful making any decisions based on this code; we are not responsibl
             engagement: {},
             leads: {}
           };
-          result.traffic['mtd_views'] = item.overall_view;
-          result.traffic['projected_views'] = project(item.overall_view);
-          result.traffic['top_pv'] = top_views;
-          result.traffic['top_pr'] = top_reads;
-          result.traffic['first_touch_views'] = item.first_touch_view;
-          result.traffic['first_touch_reads'] = item.first_touch_read;
-          result.traffic['first_touch_read_conv'] = (item.first_touch_read / item.first_touch_view * 100).toFixed(1) + '%';
-          result.traffic['overall_views'] = item.overall_view;
-          result.traffic['overall_reads'] = item.overall_read;
-          result.traffic['overall_read_conv'] = (item.overall_read / item.overall_view * 100).toFixed(1) + '%';
-          result.engagement['subscribes'] = item.subscribe;
-          result.engagement['unsubscribes'] = undefined;
-          result.engagement['shares'] = item.shares;
-          result.engagement['second_art_conv'] = (item.second_article / item.overall_view * 100).toFixed(1) + '%';
-          result.engagement['corp_site_conv'] = (item.blog_view_corp_site / item.overall_view * 100).toFixed(1) + '%';
-          result.leads['first_touch_views'] = item.first_touch_view;
-          result.leads['first_touch_signups'] = item.blog_signup;
-          result.leads['first_touch_singup_conv'] = (item.blog_signup / item.first_touch * 100).toFixed(1) + '%';
-          result.leads['overall_site_views'] = item.overall_view_corp_site;
-          result.leads['overall_signups'] = item.overall_signup;
-          result.leads['overall_signup_conv'] = (item.overall_view_corp_site / item.overall_signup * 100).toFixed(1) + '%';
+          result.traffic.mtd_views = item.overall_view;
+          result.traffic.projected_views = project(item.overall_view);
+          result.traffic.top_pv = top_views;
+          result.traffic.top_pr = top_reads;
+          result.traffic.first_touch_views = item.first_touch_view;
+          result.traffic.first_touch_reads = item.first_touch_read;
+          result.traffic.first_touch_read_conv = (item.first_touch_read / item.first_touch_view * 100).toFixed(1) + '%';
+          result.traffic.overall_views = item.overall_view;
+          result.traffic.overall_reads = item.overall_read;
+          result.traffic.overall_read_conv = (item.overall_read / item.overall_view * 100).toFixed(1) + '%';
+          result.traffic.channels = item.blog_channels;
+          result.engagement.subscribes = item.subscribe;
+          result.engagement.unsubscribes = undefined;
+          result.engagement.shares = item.shares;
+          result.engagement.second_art_conv = (item.second_article / item.overall_view * 100).toFixed(1) + '%';
+          result.engagement.corp_site_conv = (item.blog_view_corp_site / item.overall_view * 100).toFixed(1) + '%';
+          result.leads.first_touch_views = item.first_touch_view;
+          result.leads.first_touch_signups = item.blog_signup;
+          result.leads.first_touch_singup_conv = (item.blog_signup / item.first_touch * 100).toFixed(1) + '%';
+          result.leads.overall_site_views = item.overall_view_corp_site;
+          result.leads.overall_signups = item.overall_signup;
+          result.leads.overall_signup_conv = (item.overall_signup / item.overall_view_corp_site * 100).toFixed(1) + '%';
           return result;
         });
       }
