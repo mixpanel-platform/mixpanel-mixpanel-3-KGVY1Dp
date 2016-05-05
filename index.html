@@ -450,6 +450,7 @@ Please be careful making any decisions based on this code; we are not responsibl
       }
       
       function blogVsOverallSignup(firstViews, firstSignups, firstConv, overallViews, overallSignups, overallConv) {
+        console.log(firstConv);
         var $blogVsOverallDiv = $('#leads-conv');
         var blogVsOverallArrays = [
           ['', 'Views', 'Signups', 'Conversion'],
@@ -642,7 +643,7 @@ Please be careful making any decisions based on this code; we are not responsibl
           result.engagement.shares = item.shares;
           result.engagement.second_art_conv = (item.second_article / item.overall_view * 100).toFixed(1) + '%';
           result.engagement.corp_site_conv = (item.blog_view_corp_site / item.overall_view * 100).toFixed(1) + '%';
-          result.leads.first_touch_views = item.first_touch_view;
+          result.leads.first_touch_views = item.blog_view_corp_site;
           result.leads.first_touch_signups = item.blog_signup;
           result.leads.first_touch_singup_conv = (item.blog_signup / item.first_touch * 100).toFixed(1) + '%';
           result.leads.overall_site_views = item.overall_view_corp_site;
