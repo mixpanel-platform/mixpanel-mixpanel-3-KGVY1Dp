@@ -281,6 +281,7 @@ Please be careful making any decisions based on this code; we are not responsibl
           from_date: date_to_string(new Date(new Date().getYear(), new Date().getMonth())),
           to_date: date_to_string(today)
         }
+        console.log(queryParams);
         MP.api.jql(script, queryParams).done(function(results) {
           displayDashboard(results);
         });
@@ -435,7 +436,6 @@ Please be careful making any decisions based on this code; we are not responsibl
       
       function displayLeads(leadInfo) {
         firstTouch(leadInfo.first_touch_signups, '(EX)', '$293K', '(EX)', '$34K');
-        console.log(leadInfo)
         blogVsOverallSignup(leadInfo.first_touch_views, leadInfo.first_touch_signups, leadInfo.first_touch_signup_conv, leadInfo.overall_site_views, leadInfo.overall_signups, leadInfo.overall_signup_conv);
       }
       
@@ -451,7 +451,6 @@ Please be careful making any decisions based on this code; we are not responsibl
       }
       
       function blogVsOverallSignup(firstViews, firstSignups, firstConv, overallViews, overallSignups, overallConv) {
-        console.log(firstConv);
         var $blogVsOverallDiv = $('#leads-conv');
         var blogVsOverallArrays = [
           ['', 'Views', 'Signups', 'Conversion'],
@@ -674,7 +673,7 @@ Please be careful making any decisions based on this code; we are not responsibl
       }
       
       function daysInMonth(year, month) {
-          return new Date(year, month, 0).getDate();
+          return new Date(year, month+1, 0).getDate();
       }
     </script>
     <script type="text/jql" id="channel_traffic"></script>
