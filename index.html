@@ -278,7 +278,7 @@ Please be careful making any decisions based on this code; we are not responsibl
         script = $.trim(script);
         var today = new Date();
         var queryParams = {
-          from_date: date_to_string(new Date(new Date().getYear(), new Date().getMonth())),
+          from_date: date_to_string(new Date(new Date().getFullYear(), new Date().getMonth())),
           to_date: date_to_string(today)
         }
         console.log(queryParams);
@@ -667,7 +667,7 @@ Please be careful making any decisions based on this code; we are not responsibl
         var d = new Date();
         var today = d.getDate();
         var month = d.getMonth();
-        var year = d.getYear();
+        var year = d.getFullYear();
         var totalDays = daysInMonth(year, month);
         return (value * (totalDays / today)).toFixed();
       }
