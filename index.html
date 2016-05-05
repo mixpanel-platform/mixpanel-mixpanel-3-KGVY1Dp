@@ -30,7 +30,7 @@ Please be careful making any decisions based on this code; we are not responsibl
       }
       .card {
         background-color: rgb(251,252,253);
-        border: 10px solid #e5e7ee;
+        border: 10px solid #eff1f6;
         width: 41%;
         vertical-align: top;
         margin: 11px;
@@ -273,7 +273,7 @@ Please be careful making any decisions based on this code; we are not responsibl
         script = $.trim(script);
         var today = new Date();
         var queryParams = {
-          from_date: date_to_string(new Date(today - 1000*60*60*24*30)),
+          from_date: date_to_string(new Date(new Date().getYear(), new Date.getMonth())),
           to_date: date_to_string(today)
         }
         MP.api.jql(script, queryParams).done(function(results) {
@@ -319,7 +319,7 @@ Please be careful making any decisions based on this code; we are not responsibl
         mtdViews(trafficInfo.mtd_views, trafficInfo.projected_views);
         viewVsRead(trafficInfo.first_touch_views, trafficInfo.first_touch_reads, trafficInfo.first_touch_read_conv, trafficInfo.overall_views, trafficInfo.overall_reads, trafficInfo.overall_read_conv);
         topPostTable(trafficInfo.top_pv, trafficInfo.top_pr);
-        // channel breakdown
+        byChannel(trafficInfo.channels);
       }
       
       function mtdViews(views, projected) {
@@ -334,8 +334,9 @@ Please be careful making any decisions based on this code; we are not responsibl
       function addProgressBar(div, goal, toDate) {
         var $bar = div.find('.progress-bar');
         var percentage = toDate / goal;
+        var color = percentage > 1 ? 'background-color: green;' : '';
         var pixels = $bar.width() * percentage;
-        $('<div class="progress" style="width: ' + pixels + 'px"></div>').appendTo($bar);
+        $('<div class="progress" style="width: ' + pixels + 'px;' + color + '"></div>').appendTo($bar);
       }
       
       function viewVsRead(firstView, firstRead, firstConv, overallView, overallRead, overallConv) {
@@ -365,6 +366,11 @@ Please be careful making any decisions based on this code; we are not responsibl
         }
         addTable($viewDiv, viewArrays);
         addTable($readDiv, readArrays);
+      }
+      
+      function byChannel(channels) {
+        var $channelDiv = $('#traffic-by-channel');
+        addChart($channelDiv, 'bar', channels);
       }
       
       function displayEngagement(engagementInfo) {
@@ -398,6 +404,7 @@ Please be careful making any decisions based on this code; we are not responsibl
         var $graphDiv = $div.find('.graph');
         var highcharts;
         if (type === 'pie') {
+          // reduce distance between pie pieces and labels (default is 30px)
           highcharts = {
             plotOptions: {
               pie: {
