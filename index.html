@@ -601,7 +601,7 @@ Please be careful making any decisions based on this code; we are not responsibl
             } else if (e.name === 'Blog - Share') {
               var share_method = e.properties.Method;
               state.share[share_method] = 1;
-            } else if (e.name === 'Viewed landing page') {
+            } else if (e.name === 'Viewed landing page' || e.name === 'Landing: AB Testing' || e.name === 'Landing: Education Videos' || e.name === 'Landing: Funnels' || e.name === 'homepage new' || e.name === 'Landing: Segmentation' || e.name === 'Landing: Retention' || e.name === 'Landing: Revenue' || e.name === 'Landing: People' || e.name === 'View pricing page' || e.name === 'Office Hours') {
               if (state.first_touch) {
                 // viewed corp site after blog was first page they visited
                 state.blog_view_corp_site = 1;
@@ -646,7 +646,7 @@ Please be careful making any decisions based on this code; we are not responsibl
           result.engagement.corp_site_conv = (item.blog_view_corp_site / item.overall_view * 100).toFixed(1) + '%';
           result.leads.first_touch_views = item.blog_view_corp_site;
           result.leads.first_touch_signups = item.blog_signup;
-          result.leads.first_touch_singup_conv = (item.blog_signup / item.first_touch * 100).toFixed(1) + '%';
+          result.leads.first_touch_signup_conv = (item.blog_signup / item.first_touch * 100).toFixed(1) + '%';
           result.leads.overall_site_views = item.overall_view_corp_site;
           result.leads.overall_signups = item.overall_signup;
           result.leads.overall_signup_conv = (item.overall_signup / item.overall_view_corp_site * 100).toFixed(1) + '%';
