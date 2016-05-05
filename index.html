@@ -464,7 +464,8 @@ Please be careful making any decisions based on this code; we are not responsibl
       // run graph query and populate graph
       function populateGraph(dates, unit) {
         var params = $.extend(dates, {
-          unit: unit
+          unit: unit,
+          where: 'not defined (properties["Date Joined"]) and not "post-mortem" in properties["slug"] and not "mobile-dashboards" in properties["slug"] and not "jql" in properties["slug"]'
         })
         MP.api.segment('Blog - Post Viewed', params).done(function(results) {
           $('#traffic-graph').MPChart('setData', results.values());
@@ -612,9 +613,6 @@ Please be careful making any decisions based on this code; we are not responsibl
           });
           return state;
         })
-        // .filter(function(item) { 
-        //   return _.values(item.value).indexOf(1) > -1;
-        // })
         .map(function(item) {
           delete item.value['first_article'];
           return item.value;
