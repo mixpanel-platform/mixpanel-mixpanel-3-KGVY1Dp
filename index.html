@@ -243,9 +243,73 @@ Please be careful making any decisions based on this code; we are not responsibl
       // current monthly goal for blog post views
       var monthlyViewGoal = 40000;
       
+      // things to filter out when looking at blog post view/read metrics
+      
+      // filter options: 
+      // is True, is False, set, not set, contains, does not contain, equals, does not equal, less than, greater than
+      
+      // each object element should have key equal to the property name.
+      // values should be an array of 3-element arrays, in which: 
+          // 1. the first element is the filter option (from list above)
+          // 2. second element is the value. If filter option is 'is True', 'is False', 'set' or 'not set' put empty ''
+          // 3. the third element is 'event' or 'people' to denote whether it's an event or people property
+          
+          // Examples:
+          // "payments": ["less than", 2, "people"] or 
+          // "slug": ["contains", "blog", "event"] or 
+          // "Date Joined": ["not set", "", "people"]
+            
+      // filters for the same property should be in one array
+      
+      var blogPostFilters = {
+        'Date Joined': [
+          ['not set', '', 'event']
+        ],
+        'slug': [
+          ['does not contain', 'post-mortem', 'event'], 
+          ['does not contain', 'mobile-dashboards', 'event'], 
+          ['does not contain', 'jql', 'event'],
+        ]
+      };
+
       //////////////////////////////////////////////////
       
+      // set up filters for Mixpanel xhr requests
+      var xhrWhereParam = getWhereParam(blogPostFilters);
+      var jqlParam = getJqlParam(blogPostFilters);
       
+      function getWhereParam(filterObject) {
+        var params = [];
+        _.each(blogPostFilters, function(filters, property) {
+          _.each(filters, function(filterType) {
+            if ($.isArray(filterType)) {
+              var prefix = filterType[2] === 'people' ? 'user' : 'properties';
+              if (filterType[0] === 'not set') {
+                params.push('not defined (' + prefix + '["' + property + '"])');
+              } else if (filterType[0] === 'set') {
+                params.push('defined (' + prefix + '["' + property + '"])');
+              } else if (filterType[0] === 'does not contain') {
+                params.push('not "' + filterType[1] + '" in ' + prefix + '["' + property + '"]');
+              } else if (filterType[0] === 'contains') {
+                params.push('"' + filterType[1] + '" in ' + prefix + '["' + property + '"] and defined (' + prefix + '["' + property + '"])');
+              } else if (filterType[0] === 'equals') {
+                params.push('(' + prefix + '["' + property + '"] == "' + filterType[1] + '")')
+              } else if (filterType[0] === 'does not equal') {
+                params.push('(' + prefix + '["' + property + '"] != "' + filterType[1] + '")')
+              } else if (filterType[0] === 'greater than') {
+                params.push(prefix + '["' + property + '"] > ' + filterType[1]);
+              } else if (filterType[0] === 'less than') {
+                params.push(prefix + '["' + property + '"] < ' + filterType[1]);
+              } else if (filterType[0] === 'is True') {
+                params.push(prefix + '["' + property + '"] == true');
+              } else if (filterType[0] === 'is False') {
+                params.push(prefix + '["' + property + '"] == false');
+              }
+            }
+          });
+        });
+        return params.join(' and ');
+      }
       
       // set up dropdowns and graph
       var options = {
@@ -279,7 +343,8 @@ Please be careful making any decisions based on this code; we are not responsibl
         var today = new Date();
         var queryParams = {
           from_date: date_to_string(new Date(new Date().getFullYear(), new Date().getMonth())),
-          to_date: date_to_string(today)
+          to_date: date_to_string(today),
+          filters: blogPostFilters
         }
         MP.api.jql(script, queryParams).done(function(results) {
           displayDashboard(results);
@@ -463,7 +528,7 @@ Please be careful making any decisions based on this code; we are not responsibl
       function populateGraph(dates, unit) {
         var params = $.extend(dates, {
           unit: unit,
-          where: 'not defined (properties["Date Joined"]) and not "post-mortem" in properties["slug"] and not "mobile-dashboards" in properties["slug"] and not "jql" in properties["slug"]'
+          where: xhrWhereParam
         })
         MP.api.segment('Blog - Post Viewed', params).done(function(results) {
           $('#traffic-graph').MPChart('setData', results.values());
@@ -489,8 +554,8 @@ Please be careful making any decisions based on this code; we are not responsibl
     </script>
     <script type="text/jql" id="dashboard">
       var sources = {
-        'refer_social': ['facebook', 'twitter', 't.co', 'linkedin', 'lnkd', 'pinterest',],
-        'refer_search': ['google', 'bing', 'yahoo',],
+          'refer_social': ['facebook', 'twitter', 't.co', 'linkedin', 'lnkd', 'pinterest',],
+          'refer_search': ['google', 'bing', 'yahoo',],
       };
       function readSources(domain) {
         domain = domain.toLowerCase();
@@ -510,17 +575,17 @@ Please be careful making any decisions based on this code; we are not responsibl
         else { return 'utm_other'; }
       }
       function getTrafficSource(event) {
-        var utm = event.properties.utm_medium;
-        if (utm) {
-          return readUtm(utm);
-        } else {
-          var url = event.properties.$referring_domain;
-          if (!url) { return 'refer_not_set'; }
-          var domainList = url.split('.');
-          // if (domainList.length <= 1) { return readSources(url); }
-          // var domain = domainList.slice(0, domainList.length-1).join('.');
-          return readSources(url);
-        }
+          var utm = event.properties.utm_medium;
+          if (utm) {
+            return readUtm(utm);
+          } else {
+            var url = event.properties.$referring_domain;
+            if (!url) { return 'refer_not_set'; }
+            var domainList = url.split('.');
+            // if (domainList.length <= 1) { return readSources(url); }
+            // var domain = domainList.slice(0, domainList.length-1).join('.');
+            return readSources(url);
+          }
       }
       
       function main() {
@@ -561,32 +626,36 @@ Please be careful making any decisions based on this code; we are not responsibl
               state.first_touch = 1;
             }
             if (e.name === 'Blog - Post Viewed') {
-              // viewed article
-              state.overall_view = 1;
-              // capture which article was read
-              var post_view = e.properties.slug;
-              state.post_views[post_view] = 1;
-              // capture channel 
-              var channel = getTrafficSource(e);
-              state.blog_channels[channel] += 1;
-              // determine whether user was first touch hit
-              if (state.first_touch) {
-                state.first_touch_view = 1;
-              }
-              // determine whether converted to second article
-              if (!state.first_article) {
-                state.first_article = e.properties.slug;
-              } else if (state.first_article !== e.properties.slug) {
-                // converted to second article
-                state.second_article = 1;
+              if (passesFilter(e)) {
+                // viewed article
+                state.overall_view = 1;
+                // capture which article was viewed
+                var post_view = e.properties.slug;
+                state.post_views[post_view] = 1;
+                // capture channel 
+                var channel = getTrafficSource(e);
+                state.blog_channels[channel] += 1;
+                // determine whether user was first touch hit
+                if (state.first_touch) {
+                  state.first_touch_view = 1;
+                }
+                // determine whether converted to second article
+                if (!state.first_article) {
+                  state.first_article = e.properties.slug;
+                } else if (state.first_article !== e.properties.slug) {
+                  // converted to second article
+                  state.second_article = 1;
+                }
               }
             } else if (e.name === 'Blog - Post Read') {
-              // read article
-              state.overall_read = 1;
-              var post_read = e.properties.slug;
-              state.post_reads[post_read] = 1;
-              if (state.first_touch) {
-                state.first_touch_read = 1;
+              if (passesFilter(e)) {
+                // read article
+                state.overall_read = 1;
+                var post_read = e.properties.slug;
+                state.post_reads[post_read] = 1;
+                if (state.first_touch) {
+                  state.first_touch_read = 1;
+                }
               }
             } else if (e.name === '$signup') {
               // signed up
@@ -612,7 +681,7 @@ Please be careful making any decisions based on this code; we are not responsibl
           return state;
         })
         .map(function(item) {
-          delete item.value['first_article'];
+          delete item.value.first_article;
           return item.value;
         })
         .reduce(mixpanel.reducer.object_merge())
@@ -674,7 +743,40 @@ Please be careful making any decisions based on this code; we are not responsibl
       function daysInMonth(year, month) {
           return new Date(year, month+1, 0).getDate();
       }
-    </script>
+      
+      function passesFilter(evnt) {
+        _.each(params.filters, function(filterList, property) {
+          _.each(filterList, function(filter) {
+            if (filter[0] === 'not set') {
+              // if property exists, filter condition is not met
+              if (evnt.properties[property]) return false;
+            } else if (filter[0] === 'set') {
+              // if property does not exist, filter condition is not met
+              if (!evnt.properties[property]) return false;
+            } else if (filter[0] === 'does not contain') {
+              // if property value contains filtered value, filter condition is not met
+              if (evnt.properties[property] && evnt.properties[property].indexOf(filter[1]) > -1) return false;
+            } else if (filter[0] === 'contains') {
+              // if property value not in filtered value, filter condition is not met
+              if (evnt.properties[property] && evnt.properties[property].indexOf(filter[1]) === -1) return false;
+            } else if (filter[0] === 'equals') {
+              if (evnt.properties[property] != filter[1]) return false;
+            } else if (filter[0] === 'does not equal') {
+              if (evnt.properties[property] == filter[1]) return false;
+            } else if (filter[0] === 'greater than') {
+              if (evnt.properties[property] <= filter[1]) return false;
+            } else if (filter[0] === 'less than') {
+              if (evnt.properties[property] >= filter[1]) return false;
+            } else if (filter[0] === 'is True') {
+              if (evnt.properties[property] != true) return false;
+            } else if (filter[0] === 'is False') {
+              if (evnt.properties[property] != false) return false;
+            }
+          });
+        });
+        return true;
+      }
+</script>
     <script type="text/jql" id="channel_traffic"></script>
   </body>
 </html>
