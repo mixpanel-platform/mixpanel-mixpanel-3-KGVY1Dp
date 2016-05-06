@@ -184,7 +184,7 @@ Please be careful making any decisions based on this code; we are not responsibl
           <div class="progress-bar"></div>
         </div>
         <div class="card-section" id="traffic-pv-pr">
-          <h3>Posts Viewed vs. Read</h3>
+          <h3>Unique Posts Viewed vs. Read</h3>
           <div class="table"></div>
         </div>
         <div class="card-section" id="traffic-by-post">
@@ -557,16 +557,16 @@ Please be careful making any decisions based on this code; we are not responsibl
           'refer_search': ['google', 'bing', 'yahoo',],
       };
       function readSources(domain) {
-        domain = domain.toLowerCase();
-        var types = Object.keys(sources);
-        for (var i = 0, j = types.length; i < j; i++) {
-          for (var k = 0, l = sources[types[i]].length; k < l; k++) {
-            if (domain.indexOf(sources[types[i]][k]) > -1) {
-              return types[i];
+          domain = domain.toLowerCase();
+          var types = Object.keys(sources);
+          for (var i = 0, j = types.length; i < j; i++) {
+            for (var k = 0, l = sources[types[i]].length; k < l; k++) {
+              if (domain.indexOf(sources[types[i]][k]) > -1) {
+                return types[i];
+              }
             }
           }
-        }
-        return 'refer_other';
+          return 'refer_other';
       }
       function readUtm(utm) {
         if (utm.toLowerCase() === 'email') { return 'utm_email'; }
@@ -621,7 +621,7 @@ Please be careful making any decisions based on this code; we are not responsibl
           };
           _.each(events, function(e) {
             // first touch user?
-            if (!state.first_touch && e.properties['first touch landing page url'] && e.properties['first touch landing page url'].indexOf('blog') > -1) {
+            if (state.first_touch === 0 && e.properties['first touch landing page url'] && e.properties['first touch landing page url'].indexOf('blog') > -1) {
               state.first_touch = 1;
             }
             if (e.name === 'Blog - Post Viewed') {
@@ -635,7 +635,7 @@ Please be careful making any decisions based on this code; we are not responsibl
                 var channel = getTrafficSource(e);
                 state.blog_channels[channel] += 1;
                 // determine whether user was first touch hit
-                if (state.first_touch) {
+                if (state.first_touch === 1) {
                   state.first_touch_view = 1;
                 }
                 // determine whether converted to second article
@@ -652,15 +652,15 @@ Please be careful making any decisions based on this code; we are not responsibl
                 state.overall_read = 1;
                 var post_read = e.properties.slug;
                 state.post_reads[post_read] = 1;
-                if (state.first_touch) {
+                if (state.first_touch === 1) {
                   state.first_touch_read = 1;
                 }
               }
             } else if (e.name === '$signup') {
               // signed up
-              if (state.first_touch) {
+              if (state.first_touch === 1) {
                 state.blog_signup = 1;
-              } else {
+              } else if (state.overall_view_corp_site === 1) {
                 state.overall_signup = 1;
               }
             } else if (e.name === 'Blog - Subscribed') {
@@ -669,7 +669,7 @@ Please be careful making any decisions based on this code; we are not responsibl
               var share_method = e.properties.Method;
               state.share[share_method] = 1;
             } else if (e.name === 'Viewed landing page' || e.name === 'Landing: AB Testing' || e.name === 'Landing: Education Videos' || e.name === 'Landing: Funnels' || e.name === 'homepage new' || e.name === 'Landing: Segmentation' || e.name === 'Landing: Retention' || e.name === 'Landing: Revenue' || e.name === 'Landing: People' || e.name === 'View pricing page' || e.name === 'Office Hours') {
-              if (state.first_touch) {
+              if (state.first_touch === 1) {
                 // viewed corp site after blog was first page they visited
                 state.blog_view_corp_site = 1;
               } else {
