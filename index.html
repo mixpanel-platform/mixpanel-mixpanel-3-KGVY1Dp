@@ -275,9 +275,6 @@ Please be careful making any decisions based on this code; we are not responsibl
       //////////////////////////////////////////////////
       
       // set up filters for Mixpanel xhr requests
-      var xhrWhereParam = getWhereParam(blogPostFilters);
-      var jqlParam = getJqlParam(blogPostFilters);
-      
       function getWhereParam(filterObject) {
         var params = [];
         _.each(blogPostFilters, function(filters, property) {
@@ -310,6 +307,8 @@ Please be careful making any decisions based on this code; we are not responsibl
         });
         return params.join(' and ');
       }
+      
+      var xhrWhereParam = getWhereParam(blogPostFilters);
       
       // set up dropdowns and graph
       var options = {
